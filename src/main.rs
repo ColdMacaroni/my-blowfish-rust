@@ -149,9 +149,10 @@ fn bytes_to_blocks(bytes: &Vec<u8>) -> Vec<u64> {
     }
 
     for idx in (0..bytes.len()).step_by(4) {
+        blocks.push(0);
         for offset in 0..8 {
-            blocks[idx] <<= 8;
-            blocks[idx] |= get_byte!(bytes, idx, offset) as u64;
+            blocks[idx/4] <<= 8;
+            blocks[idx/4] |= get_byte!(bytes, idx, offset) as u64;
         }
     }
 
