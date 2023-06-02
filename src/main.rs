@@ -46,6 +46,26 @@ fn combine(l: &u32, r: &u32) -> u64 {
     //! Puts two u32s into one u64
     ((*l as u64) << 32) | (*r as u64)
 }
+fn encrypt_block(block: u64, p_subkeys: &[u32; 18], s_boxes: &[[u32; 256]; 4]) -> u64 {
+    let (mut left, mut right) = split(&block);
+
+    for i in 0..16 {
+        left ^= p_subkeys[i];
+        right ^= f(&left, s_boxes);
+
+        // Swap
+        (left, right) = (right, left);
+    }
+
+    // Undo the last swap
+    (left, right) = (right, left);
+
+    right ^= p_subkeys[16];
+    left ^= p_subkeys[17];
+
+    combine(&left, &right)
+}
+
 fn main() {
     let (filename, password) = get_args();
 
