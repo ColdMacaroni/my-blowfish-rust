@@ -26,10 +26,6 @@ fn get_args() -> (String, String) {
     (filename.to_string(), password.to_string())
 }
 
-fn _gen_p_array() {
-    let _p: [u32; 18];
-}
-
 fn quartets(n: &u32) -> (u8, u8, u8, u8) {
     //! Splits a u32 into four u8s
     (
@@ -76,6 +72,44 @@ fn encrypt_block(block: u64, p_subkeys: &[u32; 18], s_boxes: &[[u32; 256]; 4]) -
     left ^= p_subkeys[17];
 
     combine(&left, &right)
+}
+
+fn generate_arrays(key: [u32; 14]) -> ([u32; 18], [[u32; 256]; 4]) {
+    //! Creates the P subkeys and the S boxes based on the password and... PI.
+    //! 14 * 32 = 448. P has more subkeys but those are generated dynamically
+    //! Returns P, S.
+    let mut p: [u32; 18] = [0; 18];
+    let mut s: [[u32; 256]; 4] = [[0; 256]; 4];
+
+    // Initialise with the digits of PI
+    p[0] = 0x243f6a88;
+    p[1] = 0x85a308d3;
+    p[2] = 0x13198a2e;
+    p[3] = 0x03707344;
+
+    // Xor as much as we can with the key
+    for i in 0..key.len() {
+        p[i] ^= key[i];
+    }
+
+    // We now need to populate the rest of the stuff, using the previous calculations of blowfish
+    let (l, r) = (0, 0);
+
+    // First start with the Ps,
+    // we go up 2 by 2 because one encryption fills 2 spots like
+    // p[0] = left, p[1] = right
+    for i in (0..p.len()).filter(|n| n % 2 == 0) {
+        (p[i], p[i + 1]) = split(&encrypt_block(combine(&l, &r), &p, &s));
+    }
+
+    // Now we do the Ss, same concept as before
+    for b in 0..s.len() {
+        for i in (0..s[0].len()).filter(|n| n % 2 == 0) {
+            (s[b][i], s[b][i + 1]) = split(&encrypt_block(combine(&l, &r), &p, &s));
+        }
+    }
+
+    (p, s)
 }
 
 fn main() {
