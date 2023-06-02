@@ -26,12 +26,26 @@ fn _gen_p_array() {
     let _p: [u32; 18];
 }
 
-fn split(n: u64) -> (u32, u32) {
+fn quartets(n: &u32) -> (u8, u8, u8, u8) {
+    //! Splits a u32 into four u8s
+    (
+        (n >> 8 * 3) as u8,
+        (n >> 8 * 2) as u8,
+        (n >> 8 * 1) as u8,
+        *n as u8,
+    )
+}
+
+fn split(n: &u64) -> (u32, u32) {
     //! Returns the two halves of the u64 as u32s
     //! First one is bitshifted to the right by 32, second one is &'d
     ((n >> 32) as u32, (n & 0xffffffff) as u32)
 }
 
+fn combine(l: &u32, r: &u32) -> u64 {
+    //! Puts two u32s into one u64
+    ((*l as u64) << 32) | (*r as u64)
+}
 fn main() {
     let (filename, password) = get_args();
 
