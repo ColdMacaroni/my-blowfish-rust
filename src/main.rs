@@ -22,6 +22,16 @@ fn get_args() -> (String, String) {
     (filename.to_string(), password.to_string())
 }
 
+fn _gen_p_array() {
+    let _p: [u32; 18];
+}
+
+fn split(n: u64) -> (u32, u32) {
+    //! Returns the two halves of the u64 as u32s
+    //! First one is bitshifted to the right by 32, second one is &'d
+    ((n >> 32) as u32, (n & 0xffffffff) as u32)
+}
+
 fn main() {
     let (filename, password) = get_args();
 
