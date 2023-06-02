@@ -98,13 +98,13 @@ fn generate_arrays(key: [u32; 14]) -> ([u32; 18], [[u32; 256]; 4]) {
     // First start with the Ps,
     // we go up 2 by 2 because one encryption fills 2 spots like
     // p[0] = left, p[1] = right
-    for i in (0..p.len()).filter(|n| n % 2 == 0) {
+    for i in (0..p.len()).step_by(2) {
         (p[i], p[i + 1]) = split(&encrypt_block(combine(&l, &r), &p, &s));
     }
 
     // Now we do the Ss, same concept as before
     for b in 0..s.len() {
-        for i in (0..s[0].len()).filter(|n| n % 2 == 0) {
+        for i in (0..s[0].len()).step_by(2) {
             (s[b][i], s[b][i + 1]) = split(&encrypt_block(combine(&l, &r), &p, &s));
         }
     }
