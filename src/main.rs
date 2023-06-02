@@ -46,6 +46,14 @@ fn combine(l: &u32, r: &u32) -> u64 {
     //! Puts two u32s into one u64
     ((*l as u64) << 32) | (*r as u64)
 }
+
+fn f(n: &u32, s_boxes: &[[u32; 256]; 4]) -> u32 {
+    //! This is literally called the f-function, it just messes up the number
+    let (a, b, c, d) = quartets(n);
+    ((s_boxes[0][a as usize] + s_boxes[1][b as usize]) ^ s_boxes[2][c as usize])
+        + s_boxes[3][d as usize]
+}
+
 fn encrypt_block(block: u64, p_subkeys: &[u32; 18], s_boxes: &[[u32; 256]; 4]) -> u64 {
     let (mut left, mut right) = split(&block);
 
