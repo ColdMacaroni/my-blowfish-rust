@@ -181,6 +181,19 @@ fn main() {
             exit(2);
     };
 
+    let key = password_to_key(&password);
+
+    let (p, s) = generate_arrays(key);
+
+    let blocks = bytes_to_blocks(&bytes);
+
+    // If decrypting, reverse p
+    let encrypted_blocks = blocks.iter().map(|b| encrypt_block(*b, &p, &s)).collect();
+
     // Write our final stuff
-    fs::write(format!("{}.bf", &filename), bytes).expect("error writing file");
+    fs::write(
+        format!("{}.bf", &filename),
+        blocks_to_bytes(&encrypted_blocks),
+    )
+    .expect("error writing file");
 }
