@@ -112,6 +112,67 @@ fn generate_arrays(key: [u32; 14]) -> ([u32; 18], [[u32; 256]; 4]) {
     (p, s)
 }
 
+fn password_to_key(password: &String) -> [u32; 14] {
+    //! Converts the bytes of the password into an array of u32
+    let bytes: Vec<u8> = password.bytes().collect();
+    let mut key: [u32; 14] = [0; 14];
+
+    // This will wrap around, 4 because four u8s in a u32
+    macro_rules! get_byte {
+        ($b:expr, $i:expr, $n:expr) => {
+            $b[($i * 4 + $n) % $b.len()]
+        };
+    }
+
+    for idx in 0..key.len() {
+        key[idx] = ((get_byte!(bytes, idx, 0) as u32) << 8 * 3)
+            | ((get_byte!(bytes, idx, 1) as u32) << 8 * 2)
+            | ((get_byte!(bytes, idx, 2) as u32) << 8 * 1)
+            | ((get_byte!(bytes, idx, 3) as u32) << 8 * 0);
+    }
+
+    key
+}
+
+fn bytes_to_blocks(bytes: &Vec<u8>) -> Vec<u64> {
+    //! Converts bytes (u8s) into u64s.
+    let mut blocks: Vec<u64> = Vec::new();
+
+    // Similar to the one in password_to_key, but uses 0 instead of wrapping around
+    macro_rules! get_byte {
+        ($b:expr, $i:expr, $n:expr) => {
+            match $b.get($i + $n) {
+                Some(v) => *v,
+                None => 0,
+            }
+        };
+    }
+
+    for idx in (0..bytes.len()).step_by(4) {
+        for offset in 0..8 {
+            blocks[idx] <<= 8;
+            blocks[idx] |= get_byte!(bytes, idx, offset) as u64;
+        }
+    }
+
+    blocks
+}
+
+fn blocks_to_bytes(blocks: &Vec<u64>) -> Vec<u8> {
+    //! Converts blocks (u64s) to bytes (u8s)
+    let mut bytes = Vec::new();
+
+    for block in blocks {
+        // 8 bytes in a block
+        for offset in 0..8 {
+            // We want the leftmost byte to be the first
+            bytes.push((*block >> (7 - offset) * 8) as u8);
+        }
+    }
+
+    bytes
+}
+
 fn main() {
     let (filename, password) = get_args();
 
