@@ -48,8 +48,10 @@ fn combine(l: &u32, r: &u32) -> u64 {
 }
 
 fn f(n: &u32, s_boxes: &[[u32; 256]; 4]) -> u32 {
-    //! This is literally called the f-function, it just messes up the number
+    //! This is literally called the f-function, it just messes with the number
     let (a, b, c, d) = quartets(n);
+    // These additions are meant to be mod 2^32. It should just overflow here and be ok
+    // (Untested)
     ((s_boxes[0][a as usize] + s_boxes[1][b as usize]) ^ s_boxes[2][c as usize])
         + s_boxes[3][d as usize]
 }
@@ -151,8 +153,8 @@ fn bytes_to_blocks(bytes: &Vec<u8>) -> Vec<u64> {
     for idx in (0..bytes.len()).step_by(4) {
         blocks.push(0);
         for offset in 0..8 {
-            blocks[idx/4] <<= 8;
-            blocks[idx/4] |= get_byte!(bytes, idx, offset) as u64;
+            blocks[idx / 4] <<= 8;
+            blocks[idx / 4] |= get_byte!(bytes, idx, offset) as u64;
         }
     }
 
