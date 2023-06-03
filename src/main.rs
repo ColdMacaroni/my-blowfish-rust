@@ -119,7 +119,8 @@ fn password_to_key(password: &String) -> [u32; 14] {
     let bytes: Vec<u8> = password.bytes().collect();
     let mut key: [u32; 14] = [0; 14];
 
-    // This will wrap around, 4 because four u8s in a u32
+    // This will wrap around the string.
+    // 4 because four u8s in a u32
     macro_rules! get_byte {
         ($b:expr, $i:expr, $n:expr) => {
             $b[($i * 4 + $n) % $b.len()]
