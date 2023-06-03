@@ -2,7 +2,7 @@
 // https://www.schneier.com/academic/archives/1994/09/description_of_a_new.html
 // https://en.wikipedia.org/wiki/Blowfish_(cipher)
 
-pub(crate) use std::{env, fs, process::exit};
+use std::{env, fs, process::exit};
 
 fn get_args() -> (String, String) {
     //! Gets the filename and password. Will exit the program if neither exist
