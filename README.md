@@ -1,4 +1,2 @@
 # my-blowfish-rust
-Implementing blowfish bc i can, don't use for an actual project.
-
-When the rust is sus!
+Currently not working. The page said to init some stuff to 0 but it just makes everything 0..
